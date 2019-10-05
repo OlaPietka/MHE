@@ -6,7 +6,7 @@ namespace Nonogram
 {
     public class Board
     {
-        private readonly List<int>[] _rowsNumbers; //to do
+        private readonly List<int>[] _rowsNumbers; //to do 2
         private readonly List<int>[] _columnsNumbers;
         private readonly int _rowCount;
         private readonly int _columnCount;
