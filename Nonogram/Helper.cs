@@ -5,7 +5,7 @@ namespace Nonogram
 {
     public static class Helper
     {
-        private static readonly Random _random = new Random();
+        private static readonly Random _random = new Random(); //lol
 
         public static bool[,] GenerateRandomGameBoard(int n, int m)
         {
