@@ -86,7 +86,7 @@ namespace Nonogram
 
         private static List<bool[,]> GenerateCombinations(int rows, int columns)
         {
-            IEnumerable<int> Generator(int limit, int duplicates)
+            IEnumerable<int> Generator(int limit, long duplicates)
             {
                 while (true)
                 {
@@ -99,14 +99,14 @@ namespace Nonogram
             }
 
             var valueLimit = (int)Math.Pow(2, columns);
-            var combinations = (int)Math.Pow(valueLimit, rows);
+            var combinations = (long)Math.Pow(valueLimit, rows);
 
             var enumerators = new List<IEnumerator<int>>();
             for (var i = 0; i < rows; i++)
-                enumerators.Add(Generator(valueLimit, (int)Math.Pow(valueLimit, rows - i - 1)).GetEnumerator());
+                enumerators.Add(Generator(valueLimit, (long)Math.Pow(valueLimit, rows - i - 1)).GetEnumerator());
 
             var result = new List<bool[,]>();
-            for (var i = 0; i < combinations; i++)
+            for (long i = 0; i < combinations; i++)
             {
                 var t = new bool[rows, columns];
 
