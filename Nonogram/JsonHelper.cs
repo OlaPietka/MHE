@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.IO;
 
 namespace Nonogram
@@ -19,16 +18,33 @@ namespace Nonogram
             return JsonConvert.DeserializeObject<BoardValues>(json);
         }
 
-        public static void WriteJsonFile(bool[,] board, int errors, float time, string fileName)
+        public static void WriteJsonFile(Result result, float time, string fileName)
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), fileName);
-
-            var outputResult = new JObject(new JProperty("Errors", errors), new JProperty("Time", time), new JProperty("Board", board));
 
             using (var file = File.CreateText(path))
             using (var writer = new JsonTextWriter(file))
             {
-                outputResult.WriteTo(writer);
+                writer.Formatting = Formatting.Indented;
+
+                writer.WriteStartObject();
+                writer.WritePropertyName("Errors");
+                writer.WriteValue(result.Error);
+                writer.WritePropertyName("Time");
+                writer.WriteValue(time);
+                writer.WritePropertyName("Board");
+                writer.WriteStartArray();
+
+                for (var i = 0; i < result.Board.GetLength(0); i++)
+                {
+                    writer.WriteStartArray();
+                    for (var j = 0; j < result.Board.GetLength(0); j++)
+                        writer.WriteValue(result.Board[i, j]);
+                    writer.WriteEnd();
+                }
+
+                writer.WriteEnd();
+                writer.WriteEndObject();
             }
         }
     }
