@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Nonogram
 {
@@ -13,7 +15,9 @@ namespace Nonogram
             var min = int.MaxValue;
             var finalBoard = new bool[boardValues.RowCount, boardValues.ColumnCount];
 
-            foreach (var board in GenerateCombinations(boardValues.RowCount, boardValues.ColumnCount))
+            var watch = Stopwatch.StartNew();
+            var x = 0;
+            Parallel.ForEach(GenerateCombinations(boardValues.RowCount, boardValues.ColumnCount), board =>
             {
                 var errors = CheckForErrors(boardValues, board);
 
@@ -22,7 +26,12 @@ namespace Nonogram
                     min = errors;
                     finalBoard = board;
                 }
-            }
+
+                Console.WriteLine(++x);
+            });
+            watch.Stop();
+
+            var time = watch.ElapsedMilliseconds / 1000f;
 
             for (var i = 0; i < finalBoard.GetLength(0); i++)
             {
@@ -34,7 +43,7 @@ namespace Nonogram
                 Console.Write("\n");
             }
 
-            JsonHelper.WriteJsonFile(finalBoard, min, "output.json");
+            JsonHelper.WriteJsonFile(finalBoard, min, time, "output.json");
 
             Console.ReadKey();
         }
@@ -84,7 +93,7 @@ namespace Nonogram
             return errors;
         }
 
-        private static List<bool[,]> GenerateCombinations(int rows, int columns)
+        private static IEnumerable<bool[,]> GenerateCombinations(int rows, int columns)
         {
             IEnumerable<int> Generator(int limit, long duplicates)
             {
@@ -120,10 +129,8 @@ namespace Nonogram
 
                 }
 
-                result.Add(t);
+                yield return t;
             }
-
-            return result;
         }
     }
 }

@@ -5,6 +5,19 @@ namespace Nonogram
 {
     public static class BoardHelper
     {
+        private static readonly Random _random = new Random();
+
+        public static bool[,] GenerateRandomBoard(int n, int m)
+        {
+            var board = new bool[n, m];
+
+            for (var i = 0; i < n; i++)
+                for (var j = 0; i < m; j++)
+                    board[i, j] = _random.Next(0, 10) % 2 != 0;
+
+            return board;
+        }
+
         public static List<int>[] GenerateNumbers(bool[,] board, int dimension)
         {
             var n = board.GetLength(0);

@@ -19,11 +19,11 @@ namespace Nonogram
             return JsonConvert.DeserializeObject<BoardValues>(json);
         }
 
-        public static void WriteJsonFile(bool[,] board, int errors, string fileName)
+        public static void WriteJsonFile(bool[,] board, int errors, float time, string fileName)
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), fileName);
 
-            var outputResult = new JObject(new JProperty("Errors", errors), new JProperty("Board", board));
+            var outputResult = new JObject(new JProperty("Errors", errors), new JProperty("Time", time), new JProperty("Board", board));
 
             using (var file = File.CreateText(path))
             using (var writer = new JsonTextWriter(file))
