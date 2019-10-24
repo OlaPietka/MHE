@@ -4,6 +4,7 @@
     {
         public bool[,] Board { get; set; }
         public int Error { get; set; }
+        public float Time { get; set; }
 
         public Result(bool[,] board, int error)
         {
