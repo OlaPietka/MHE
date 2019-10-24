@@ -94,5 +94,20 @@ namespace Nonogram
                 yield return t;
             }
         }
+
+        public static List<Result> GenerateNeighbours(Result result)
+        {
+            var neighbours = new List<Result>();
+
+            for (var i = 0; i < result.Board.GetLength(0); i++)
+                for (var j = 0; j < result.Board.GetLength(1); j++)
+                {
+                    var newBoard = result.Board.Clone() as bool[,];
+                    newBoard[i, j] = !newBoard[i, j];
+                    neighbours.Add(new Result(newBoard, -1));
+                }
+
+            return neighbours;
+        }
     }
 }

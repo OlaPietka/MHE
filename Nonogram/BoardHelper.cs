@@ -51,21 +51,6 @@ namespace Nonogram
             return errors;
         }
 
-        public static List<bool[,]> GetNeighbours(bool[,] currentBoard)
-        {
-            var neighbours = new List<bool[,]>();
-
-            for (var i = 0; i < currentBoard.GetLength(0); i++)
-                for (var j = 0; j < currentBoard.GetLength(1); j++)
-                {
-                    var newBoard = currentBoard.Clone() as bool[,];
-                    newBoard[i, j] = !newBoard[i, j];
-                    neighbours.Add(newBoard);
-                }
-
-            return neighbours;
-        }
-
         public static void Print(Result result, string someNote = "")
         {
             Console.WriteLine(someNote);
