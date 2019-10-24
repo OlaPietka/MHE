@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,14 +43,13 @@ namespace Nonogram
 
             for (var i = 0; i < iteration; i++)
             {
-                foreach (var b in BoardHelper.GetNeighbours(currentResult.Board))
+                foreach (var neighbour in Generator.GenerateNeighbours(currentResult))
                 {
-                    var error = BoardHelper.CheckForErrors(boardValues, b);
+                    neighbour.Error = BoardHelper.CheckForErrors(boardValues, neighbour.Board);
 
-                    if (currentResult.Error > error)
+                    if (currentResult.Error > neighbour.Error)
                     {
-                        newResult.Error = error;
-                        newResult.Board = b.Clone() as bool[,];
+                        newResult = new Result(neighbour);
                     }
                 }
                 
@@ -63,6 +63,59 @@ namespace Nonogram
             }
 
             return currentResult;
+        }
+
+        public static Result Tabu(BoardValues boardValues, int iteration = 1000, int tabuSize = 100)
+        {
+            Console.WriteLine("---TABU---\n");
+
+            var tabuList = new List<Result>();
+
+            var randomBoard = Generator.GenerateRandomBoard(boardValues.RowCount, boardValues.ColumnCount);
+            var currentResult = new Result(randomBoard, BoardHelper.CheckForErrors(boardValues, randomBoard));
+
+            tabuList.Add(currentResult);
+
+            var globalBest = tabuList.Last();
+
+            BoardHelper.Print(currentResult, "Generated random board:");
+
+            for (var i = 0; i < iteration; i++)
+            {
+                var neighbours = Generator.GenerateNeighbours(tabuList.Last());
+
+                tabuList.ForEach(t =>
+                {
+                    neighbours.RemoveAll(x => x == t);
+                });
+
+                if (neighbours.Count <= 0)
+                    if (tabuList.Count > 1)
+                        tabuList.RemoveAt(0);
+                    else
+                        return globalBest;
+                else
+                {
+                    var currentBest = neighbours.Last();
+
+                    foreach(var neighbour in neighbours)
+                    {
+                        neighbour.Error = BoardHelper.CheckForErrors(boardValues, neighbour.Board);
+                        if (neighbour.Error < currentBest.Error)
+                            currentBest = neighbour;
+                    }
+
+                    tabuList.Add(currentBest);
+
+                    if (currentBest.Error < globalBest.Error)
+                        globalBest = currentBest;
+
+                    if (tabuList.Count >= tabuSize)
+                        tabuList.RemoveAt(0);
+                }
+            }
+
+            return globalBest;
         }
     }
 }
