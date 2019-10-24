@@ -27,7 +27,7 @@ namespace Nonogram
                 }
             });
 
-            return new Result(bestBoard, minError);
+            return new Result(bestBoard, boardValues);
         }
 
         public static Result HillClimb(BoardValues boardValues, int iteration = 1000)
@@ -35,7 +35,7 @@ namespace Nonogram
             Console.WriteLine("---HILLCLIMB---\n");
 
             var randomBoard = Generator.GenerateRandomBoard(boardValues.RowCount, boardValues.ColumnCount);
-            var currentResult = new Result(randomBoard, BoardHelper.CheckForErrors(boardValues, randomBoard));
+            var currentResult = new Result(randomBoard, boardValues);
 
             var newResult = new Result(currentResult);
 
@@ -43,10 +43,8 @@ namespace Nonogram
 
             for (var i = 0; i < iteration; i++)
             {
-                foreach (var neighbour in Generator.GenerateNeighbours(currentResult))
+                foreach (var neighbour in Generator.GenerateNeighbours(currentResult, boardValues))
                 {
-                    neighbour.Error = BoardHelper.CheckForErrors(boardValues, neighbour.Board);
-
                     if (currentResult.Error > neighbour.Error)
                     {
                         newResult = new Result(neighbour);
@@ -72,7 +70,7 @@ namespace Nonogram
             var tabuList = new List<Result>();
 
             var randomBoard = Generator.GenerateRandomBoard(boardValues.RowCount, boardValues.ColumnCount);
-            var currentResult = new Result(randomBoard, BoardHelper.CheckForErrors(boardValues, randomBoard));
+            var currentResult = new Result(randomBoard, boardValues);
 
             tabuList.Add(currentResult);
 
@@ -82,7 +80,7 @@ namespace Nonogram
 
             for (var i = 0; i < iteration; i++)
             {
-                var neighbours = Generator.GenerateNeighbours(tabuList.Last());
+                var neighbours = Generator.GenerateNeighbours(tabuList.Last(), boardValues);
 
                 tabuList.ForEach(t =>
                 {
@@ -100,15 +98,14 @@ namespace Nonogram
 
                     foreach(var neighbour in neighbours)
                     {
-                        neighbour.Error = BoardHelper.CheckForErrors(boardValues, neighbour.Board);
                         if (neighbour.Error < currentBest.Error)
-                            currentBest = neighbour;
+                            currentBest = new Result(neighbour);
                     }
 
                     tabuList.Add(currentBest);
 
                     if (currentBest.Error < globalBest.Error)
-                        globalBest = currentBest;
+                        globalBest = new Result(currentBest);
 
                     if (tabuList.Count >= tabuSize)
                         tabuList.RemoveAt(0);
