@@ -95,7 +95,7 @@ namespace Nonogram
             }
         }
 
-        public static List<Result> GenerateNeighbours(Result result)
+        public static List<Result> GenerateNeighbours(Result result, BoardValues boardValues)
         {
             var neighbours = new List<Result>();
 
@@ -104,7 +104,7 @@ namespace Nonogram
                 {
                     var newBoard = result.Board.Clone() as bool[,];
                     newBoard[i, j] = !newBoard[i, j];
-                    neighbours.Add(new Result(newBoard, -1));
+                    neighbours.Add(new Result(newBoard, boardValues));
                 }
 
             return neighbours;
