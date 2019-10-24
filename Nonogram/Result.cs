@@ -6,10 +6,10 @@
         public int Error { get; set; }
         public float Time { get; set; }
 
-        public Result(bool[,] board, int error)
+        public Result(bool[,] board, BoardValues boardValues)
         {
             Board = board;
-            Error = error;
+            Error = BoardHelper.CheckForErrors(boardValues, board);
         }
 
         public Result(Result result)
