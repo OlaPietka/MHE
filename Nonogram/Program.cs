@@ -13,14 +13,14 @@ namespace Nonogram
             var boardValues = JsonHelper.ReadJsonFile("input.json");
 
             var watch = Stopwatch.StartNew();
-            var result = new Result(Methods.HillClimb(boardValues));
+            var result = Methods.Tabu(boardValues);
             watch.Stop();
 
-            var time = watch.ElapsedMilliseconds / 1000f;
+            result.Time = watch.ElapsedMilliseconds / 1000f;
 
             BoardHelper.Print(result, "Found board:");
 
-            JsonHelper.WriteJsonFile(result, time, "output.json");
+            JsonHelper.WriteJsonFile(result, "output.json");
             Console.ReadKey();
         }
     }
