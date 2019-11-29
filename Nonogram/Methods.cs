@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Nonogram
@@ -39,7 +37,7 @@ namespace Nonogram
 
             var newResult = new Result(currentResult);
 
-            BoardHelper.Print(currentResult, "Generated random board:");
+            //BoardHelper.Print(currentResult, "Generated random board:");
 
             for (var i = 0; i < iteration; i++)
             {
@@ -76,7 +74,7 @@ namespace Nonogram
 
             var globalBest = tabuList.Last();
 
-            BoardHelper.Print(currentResult, "Generated random board:");
+            //BoardHelper.Print(currentResult, "Generated random board:");
 
             for (var i = 0; i < iteration; i++)
             {

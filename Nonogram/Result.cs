@@ -6,16 +6,18 @@
         public int Error { get; set; }
         public float Time { get; set; }
 
-        public Result(bool[,] board, BoardValues boardValues)
-        {
-            Board = board;
-            Error = BoardHelper.CheckForErrors(boardValues, board);
-        }
+        public Result() { }
 
         public Result(Result result)
         {
             Board = result.Board.Clone() as bool[,];
             Error = result.Error;
+        }
+
+        public Result(bool[,] board, BoardValues boardValues)
+        {
+            Board = board;
+            Error = BoardHelper.CheckForErrors(boardValues, board);
         }
 
         public static bool operator ==(Result a, Result b)

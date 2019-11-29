@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Nonogram
 {
     public static class JsonHelper
     {
-        public static BoardValues ReadJsonFile(string fileName)
+        private static string ReadJson(string fileName)
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), fileName);
             string json;
@@ -15,10 +16,16 @@ namespace Nonogram
                 json = reader.ReadToEnd();
             }
 
-            return JsonConvert.DeserializeObject<BoardValues>(json);
+            return json;
         }
 
-        public static void WriteJsonFile(Result result, string fileName)
+        public static BoardValues ReadInputFile(string fileName) 
+            => JsonConvert.DeserializeObject<BoardValues>(ReadJson(fileName));
+
+        public static List<BoardValues> ReadInputListFile(string fileName)
+            => JsonConvert.DeserializeObject<List<BoardValues>>(ReadJson(fileName));
+
+        public static void WriteOutputFile(Result result, string fileName)
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), fileName);
 
