@@ -109,5 +109,14 @@ namespace Nonogram
 
             return neighbours;
         }
+
+        public static Result GetRandomNeighbour(Result result, BoardValues boardValues)
+        {
+            var neighbours = GenerateNeighbours(result, boardValues);
+
+            var rnd = _random.Next(0, neighbours.Count);
+
+            return neighbours[rnd];
+        }
     }
 }

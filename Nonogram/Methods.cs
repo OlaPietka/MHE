@@ -112,5 +112,39 @@ namespace Nonogram
 
             return globalBest;
         }
+
+        public static Result SimulatedAnnealing(BoardValues boardValues, int iteration = 10000, double parameter = 40000.0, bool write = true, Func<int, double> T = null)
+        {
+            if (T == null)
+                T = x => { return parameter / x; };
+
+            var s = new List<Result>();
+            var randomBoard = Generator.GenerateRandomBoard(boardValues.RowCount, boardValues.ColumnCount);
+            var currentResult = new Result(randomBoard, boardValues);
+
+            s.Add(currentResult);
+
+            for (var k = 0; k < iteration; k++)
+            {
+                var newSolution = Generator.GetRandomNeighbour(s.Last(), boardValues);
+
+                if(newSolution.Error < s.Last().Error)
+                    s.Add(newSolution);
+                else
+                {
+                    double u = new Random().NextDouble();
+
+                    var tkError = newSolution.Error;
+                    var skError = s.Last().Error;
+
+                    s.Add(u < Math.Exp(-Math.Abs(tkError - skError) / T(k)) ? newSolution : s.Last());
+                }
+
+                if(write && k % 100 == 0)
+                    Console.WriteLine($"iteracja {k} - error {s.Last().Error}");
+            }
+
+            return s.Find(result => result.Error == s.Min(minResult => minResult.Error));
+        }
     }
 }

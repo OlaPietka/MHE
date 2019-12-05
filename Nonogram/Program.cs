@@ -11,7 +11,7 @@ namespace Nonogram
                 Console.Clear();
                 var program = Menu();
 
-                if (program == 4)
+                if (program == 5)
                     Stats.GenerateStats(inputsFilename: "inputs_list.json", outputFilename: "stats.csv");
                 else
                 {
@@ -31,6 +31,10 @@ namespace Nonogram
 
                         case 3:
                             result = Methods.Tabu(boardValues);
+                            break;
+                        case 4:
+                            (var iteration, var parameter) = Other.RunExperiment(boardValues);
+                            result = Methods.SimulatedAnnealing(boardValues, iteration, parameter);
                             break;
                     }
                     watch.Stop();
@@ -54,7 +58,8 @@ namespace Nonogram
             Console.WriteLine("     1. BruteForce");
             Console.WriteLine("     2. HillClimb");
             Console.WriteLine("     3. Tabu");
-            Console.WriteLine("4. Statystka dla wszystkich metod i przykladow z inputs.json");
+            Console.WriteLine("     4. Simulated Annealing");
+            Console.WriteLine("5. Statystka dla wszystkich metod i przykladow z inputs.json");
             return int.Parse(Console.ReadKey().KeyChar.ToString());
         }
     }
