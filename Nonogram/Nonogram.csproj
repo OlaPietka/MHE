@@ -76,6 +76,7 @@
     <Compile Include="BoardValues.cs" />
     <Compile Include="BoardHelper.cs" />
     <Compile Include="Generator.cs" />
+    <Compile Include="Genetic.cs" />
     <Compile Include="JsonHelper.cs" />
     <Compile Include="Methods.cs" />
     <Compile Include="Other.cs" />

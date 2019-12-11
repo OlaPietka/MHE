@@ -32,7 +32,7 @@ namespace Nonogram
         {
             Console.WriteLine("---HILLCLIMB---\n");
 
-            var randomBoard = Generator.GenerateRandomBoard(boardValues.RowCount, boardValues.ColumnCount);
+            var randomBoard = Generator.GenerateRandomBoard(boardValues);
             var currentResult = new Result(randomBoard, boardValues);
 
             var newResult = new Result(currentResult);
@@ -67,7 +67,7 @@ namespace Nonogram
 
             var tabuList = new List<Result>();
 
-            var randomBoard = Generator.GenerateRandomBoard(boardValues.RowCount, boardValues.ColumnCount);
+            var randomBoard = Generator.GenerateRandomBoard(boardValues);
             var currentResult = new Result(randomBoard, boardValues);
 
             tabuList.Add(currentResult);
@@ -119,7 +119,7 @@ namespace Nonogram
                 T = x => { return parameter / x; };
 
             var s = new List<Result>();
-            var randomBoard = Generator.GenerateRandomBoard(boardValues.RowCount, boardValues.ColumnCount);
+            var randomBoard = Generator.GenerateRandomBoard(boardValues);
             var currentResult = new Result(randomBoard, boardValues);
 
             s.Add(currentResult);
@@ -145,6 +145,56 @@ namespace Nonogram
             }
 
             return s.Find(result => result.Error == s.Min(minResult => minResult.Error));
+        }
+
+        public static bool[,] Genetic(List<bool[,]> initialPopulation, Func<bool[,], double> fitness,
+            Func<List<double>, int> selection, Func<bool[,], bool[,], (bool[,], bool[,])> crossover,
+            Func<bool[,], bool[,]> mutation, Func<List<bool[,]>, bool> termCondition, double crossoverPropability,
+            double mutationPropability)
+        {
+            var population = initialPopulation;
+
+            while (termCondition(population))
+            {
+                var fit = new List<double>();
+                var parents = new List<bool[,]>();
+                var children = new List<bool[,]>();
+
+                foreach (var specimen in population)
+                    fit.Add(fitness(specimen));
+
+                for (var i = 0; i < initialPopulation.Count; i++)
+                    parents.Add(population[selection(fit)]);
+
+                for (var i = 0; i < initialPopulation.Count - 1; i += 2)
+                {
+                    var u = new Random().NextDouble();
+
+                    if (crossoverPropability < u)
+                    {
+                        (var a, var b) = crossover(parents[i], parents[i + 1]);
+                        children.Add(a);
+                        children.Add(b);
+                    }
+                    else
+                    {
+                        children.Add(parents[i]);
+                        children.Add(parents[i + 1]);
+                    }
+                }
+
+                for (var i = 0; i < initialPopulation.Count - 1; i += 2)
+                {
+                    var u = new Random().NextDouble();
+
+                    if (mutationPropability < u)
+                        children[i] = mutation(children[i]);
+                }
+
+                population = children;
+            }
+
+            return population.Find(x => fitness(x) == population.Min(y => fitness(y)));
         }
     }
 }

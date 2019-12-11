@@ -7,8 +7,11 @@ namespace Nonogram
     {
         private static readonly Random _random = new Random();
 
-        public static bool[,] GenerateRandomBoard(int n, int m)
+        public static bool[,] GenerateRandomBoard(BoardValues boardValues)
         {
+            var n = boardValues.RowCount;
+            var m = boardValues.ColumnCount;
+
             var board = new bool[n, m];
 
             for (var i = 0; i < n; i++)
