@@ -194,7 +194,7 @@ namespace Nonogram
                 population = children;
             }
 
-            return population.Find(x => fitness(x) == population.Min(y => fitness(y)));
+            return population.Find(x => fitness(x) == population.Max(y => fitness(y)));
         }
     }
 }

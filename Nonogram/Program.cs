@@ -37,7 +37,7 @@ namespace Nonogram
                             result = Methods.SimulatedAnnealing(boardValues, iteration, parameter);
                             break;
                         case 5:
-                            var geneticAlgorithm = new Genetic(boardValues, 12, 20);
+                            var geneticAlgorithm = new Genetic(boardValues, 20, 25);
                             result = geneticAlgorithm.Run();
                             break;
                     }

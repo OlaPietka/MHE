@@ -27,9 +27,8 @@ namespace Nonogram
                 {
                     repeat = 10;
                     parameter += 100;
+                    iteration += 50;
                 }
-
-                iteration += 50;
             }
 
             Console.WriteLine($"--- ITERATION: {iteration}, PARAMETER: {parameter} ---");
