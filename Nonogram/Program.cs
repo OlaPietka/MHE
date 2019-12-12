@@ -37,7 +37,7 @@ namespace Nonogram
                             result = Methods.SimulatedAnnealing(boardValues, iteration, parameter);
                             break;
                         case 5:
-                            var geneticAlgorithm = new Genetic(boardValues, 20, 25);
+                            var geneticAlgorithm = new Genetic(boardValues, 20, 80, 0.6, 0.1, "TwoPoints", "Rulet", "Deviation");
                             result = geneticAlgorithm.Run();
                             break;
                     }
@@ -66,6 +66,11 @@ namespace Nonogram
             Console.WriteLine("     5. Genetic");
             Console.WriteLine("6. Statystka dla wszystkich metod i przykladow z inputs.json");
             return int.Parse(Console.ReadKey().KeyChar.ToString());
+        }
+
+        private static void ChoseParameters()
+        {
+
         }
     }
 }

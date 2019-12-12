@@ -38,9 +38,15 @@ namespace Nonogram
                         obj[0] = example;
                         for (var j = 1; j < parametersLength; j++)
                             obj[j] = parameters[j].DefaultValue;
+                        Result result;
 
                         var watch = Stopwatch.StartNew();
-                        var result = (Result)method.Invoke(Type.GetType("Nonogram.Methods"), obj);
+                        if (method.Name == "Genetic")
+                        {
+                            var gen = new Genetic(example);
+                            result = gen.Run();
+                        }else
+                            result = (Result)method.Invoke(Type.GetType("Nonogram.Methods"), obj);
                         watch.Stop();
 
                         result.Time = watch.ElapsedMilliseconds / 1000f;

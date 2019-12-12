@@ -63,7 +63,8 @@ namespace Nonogram
                         Console.Write('O');
                 Console.Write("\n");
             }
-            Console.WriteLine($"Error: {result.Error}\n");
+            Console.WriteLine($"Error: {result.Error}");
+            Console.WriteLine($"Time: {result.Time}\n");
         }
     }
 }
