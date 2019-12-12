@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Nonogram
 {
-    public static class Methods
+    public static class Method
     {
         public static Result BruteForce(BoardValues boardValues)
         {

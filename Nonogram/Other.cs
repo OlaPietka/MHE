@@ -12,7 +12,7 @@ namespace Nonogram
 
             while(true)
             {
-                var sol = Methods.SimulatedAnnealing(boardValues, iteration, parameter, write: false);
+                var sol = Method.SimulatedAnnealing(boardValues, iteration, parameter, write: false);
 
                 Console.WriteLine($"iteration: {iteration} - parameter {parameter} - error {sol.Error}");
 

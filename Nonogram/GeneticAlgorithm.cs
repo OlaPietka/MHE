@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nonogram
 {
-    public class Genetic
+    public class GeneticAlgorithm
     {
         private BoardValues _boardValues;
         private int _populationSize;
@@ -29,7 +29,7 @@ namespace Nonogram
         private double _mutationPropability;
 
 
-        public Genetic(BoardValues boardValues, int populationSize = 10, int iterationCount = 10, double crossoverPropability = 0.9, 
+        public void SetParameters(BoardValues boardValues, int populationSize = 10, int iterationCount = 10, double crossoverPropability = 0.9,
             double mutationPropability = 0.1, string crossoverMethod = "OnePoint", string selectionMethod = "Tournament",
             string termConditionMethod = "Iteration")
         {
@@ -109,7 +109,7 @@ namespace Nonogram
 
             _iterationTermCondition = pop =>
             {
-                foreach(var s in  pop)
+                foreach (var s in pop)
                     Console.Write(BoardHelper.CheckForErrors(_boardValues, s) + " ");
                 Console.WriteLine();
 
@@ -141,12 +141,12 @@ namespace Nonogram
                 return fitnesses[first] > fitnesses[second] ? first : second;
             };
 
-            _ruletSelection = fitneses => 
+            _ruletSelection = fitneses =>
             {
                 var sum_fit = fitneses.Sum();
                 var u = rnd.NextDouble() * (sum_fit - 0.0) + 0.0;
 
-                for (var i = fitneses.Count - 1; i >= 0 ; i--)
+                for (var i = fitneses.Count - 1; i >= 0; i--)
                 {
                     sum_fit -= fitneses[i];
 
@@ -157,18 +157,18 @@ namespace Nonogram
                 return 0;
             };
 
-            _rankSelection = fitneses => 
+            _rankSelection = fitneses =>
             {
                 List<(double fitness, int index)> fitnesses_with_index = new List<(double fitness, int index)>();
 
-                for(var i = 0; i < fitneses.Count; i++)
+                for (var i = 0; i < fitneses.Count; i++)
                     fitnesses_with_index.Add((fitneses[i], i));
 
                 fitnesses_with_index = fitnesses_with_index.OrderBy(x => x.fitness).ToList();
 
                 var f = new List<double>(fitneses);
                 for (var i = 0; i < fitneses.Count; i++)
-                    f[i] = (i*2) + 1;
+                    f[i] = (i * 2) + 1;
 
                 return fitnesses_with_index[_ruletSelection(f)].index;
             };
@@ -205,7 +205,7 @@ namespace Nonogram
 
         public Result Run()
         {
-            var result = Methods.Genetic(_initialPopulation, _fitness, _selection, _crossover,
+            var result = Method.Genetic(_initialPopulation, _fitness, _selection, _crossover,
                 _mutation, _termCondition, _crossoverPropability, _mutationPropability);
 
             return new Result(result, _boardValues);

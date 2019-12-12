@@ -17,7 +17,7 @@ namespace Nonogram
 
         public static void GenerateStats(string inputsFilename, string outputFilename, bool withoutBruteForce = true)
         {
-            var methods = Type.GetType("Nonogram.Methods").GetMethods(BindingFlags.Public | BindingFlags.Static).ToList();
+            var methods = Type.GetType("Nonogram.Method").GetMethods(BindingFlags.Public | BindingFlags.Static).ToList();
             var selectedMethods = methods.GetRange(Convert.ToInt32(withoutBruteForce), methods.Count - 1);
             var examples = JsonHelper.ReadInputListFile(inputsFilename);
 
@@ -43,10 +43,10 @@ namespace Nonogram
                         var watch = Stopwatch.StartNew();
                         if (method.Name == "Genetic")
                         {
-                            var gen = new Genetic(example);
+                            var gen = new GeneticAlgorithm();
                             result = gen.Run();
                         }else
-                            result = (Result)method.Invoke(Type.GetType("Nonogram.Methods"), obj);
+                            result = (Result)method.Invoke(Type.GetType("Nonogram.Method"), obj);
                         watch.Stop();
 
                         result.Time = watch.ElapsedMilliseconds / 1000f;

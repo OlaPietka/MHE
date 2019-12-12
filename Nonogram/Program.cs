@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 
 namespace Nonogram
 {
@@ -17,27 +20,49 @@ namespace Nonogram
                 {
                     var boardValues = JsonHelper.ReadInputFile("input.json");
                     var result = new Result();
+                    var parameters = new List<object>();
+                    parameters.Add(boardValues);
 
                     var watch = Stopwatch.StartNew();
                     switch (program)
                     {
                         case 1:
-                            result = Methods.BruteForce(boardValues);
+                            result = Method.BruteForce(boardValues);
                             break;
 
                         case 2:
-                            result = Methods.HillClimb(boardValues);
+                            parameters.AddRange(ChoseParameters("Ilosc itearcji [int]"));
+                            result = Invoke(nameof(Method.HillClimb), parameters);
                             break;
 
                         case 3:
-                            result = Methods.Tabu(boardValues);
+                            parameters.AddRange(ChoseParameters("Ilosc itearcji [int]", "Rozmiar tabu [int]"));
+                            result = Invoke(nameof(Method.Tabu), parameters);
                             break;
                         case 4:
-                            (var iteration, var parameter) = Other.RunExperiment(boardValues);
-                            result = Methods.SimulatedAnnealing(boardValues, iteration, parameter);
+                            Console.WriteLine("\n\nPuscic eksperyment? [t/n] :");
+                            if (Console.ReadKey().KeyChar == 'T')
+                            {
+                                (var iteration, var parameter) = Other.RunExperiment(boardValues);
+
+                                parameters.Add(iteration);
+                                parameters.Add(parameter);
+                            }else
+                                parameters.AddRange(ChoseParameters("Ilosc itearcji [int]", "Parametr temperatury [double]", "Wypisywac iteracje? [bool]"));
+
+                            result = Invoke(nameof(Method.SimulatedAnnealing), parameters);
                             break;
                         case 5:
-                            var geneticAlgorithm = new Genetic(boardValues, 20, 80, 0.6, 0.1, "TwoPoints", "Rulet", "Deviation");
+                            parameters.AddRange(ChoseParameters("Rozmiar populacji [int]", "Ilosc iteracji [int]", "Prawdopodobienstwo krzyzowania [double]", 
+                                "Prawdopodobienstwo mutacji [double]", "Metoda krzyzowania [OnePoint/TwoPoints]",
+                                "Metoda selekcji [Rulet/Rank/Tournament]", "Warunek zakonczenia [Iteration/Mean/Deviation]"));
+                            var geneticAlgorithm = new GeneticAlgorithm();
+
+                            geneticAlgorithm.GetType()
+                             .GetMember("SetParameters")
+                             .OfType<MethodInfo>()
+                             .FirstOrDefault(i => i.GetParameters().Count() == parameters.Count)
+                             .Invoke(geneticAlgorithm, parameters.ToArray());
                             result = geneticAlgorithm.Run();
                             break;
                     }
@@ -51,6 +76,7 @@ namespace Nonogram
                 }
 
                 Console.WriteLine("0. POWROT DO MENU");
+                Console.WriteLine("1. POWTÓRZ");
             } while (Console.ReadKey().KeyChar == '0');
         }
 
@@ -68,9 +94,48 @@ namespace Nonogram
             return int.Parse(Console.ReadKey().KeyChar.ToString());
         }
 
-        private static void ChoseParameters()
+        private static List<object> ChoseParameters(params string[] parameters)
         {
+            var chosenParameters = new List<object>();
 
+            Console.WriteLine("\n\nPARAMETRY:");
+
+            foreach (var parameter in parameters)
+            {
+                Console.WriteLine($"{parameter}: ");
+                var input = Console.ReadLine();
+
+                if (input == "")
+                    break;
+
+                var parseInt = 0;
+                var parseDouble = 0.0;
+                var parseBool = false;
+                if (int.TryParse(input, out parseInt))
+                    chosenParameters.Add(parseInt);
+                else if (bool.TryParse(input, out parseBool))
+                    chosenParameters.Add(parseBool);
+                else if (double.TryParse(input, out parseDouble))
+                    chosenParameters.Add(parseDouble);
+                else
+                    chosenParameters.Add(input);
+            }
+
+            return chosenParameters;
+        }
+
+        private static Result Invoke(string methodName, List<object> parameters)
+        {
+            var method = Type.GetType("Nonogram.Method").GetMember(methodName).OfType<MethodInfo>().First();
+            var methodParameters = method.GetParameters();
+
+            if (parameters.Count != methodParameters.Length)
+            {
+                for (var i = parameters.Count; i < methodParameters.Length; i++)
+                    parameters.Add(methodParameters[i].DefaultValue);
+            }
+
+            return method.Invoke(Type.GetType("Nonogram.Method"), parameters.ToArray()) as Result;
         }
     }
 }
