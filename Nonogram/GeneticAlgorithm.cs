@@ -29,7 +29,7 @@ namespace Nonogram
         private double _mutationPropability;
 
 
-        public void SetParameters(BoardValues boardValues, int populationSize = 10, int iterationCount = 10, double crossoverPropability = 0.9,
+        public GeneticAlgorithm(BoardValues boardValues, int populationSize = 10, int iterationCount = 10, double crossoverPropability = 0.9,
             double mutationPropability = 0.1, string crossoverMethod = "OnePoint", string selectionMethod = "Tournament",
             string termConditionMethod = "Iteration")
         {
@@ -205,10 +205,60 @@ namespace Nonogram
 
         public Result Run()
         {
-            var result = Method.Genetic(_initialPopulation, _fitness, _selection, _crossover,
+            var result = Algorithm(_initialPopulation, _fitness, _selection, _crossover,
                 _mutation, _termCondition, _crossoverPropability, _mutationPropability);
 
             return new Result(result, _boardValues);
+        }
+
+        private bool[,] Algorithm(List<bool[,]> initialPopulation, Func<bool[,], double> fitness,
+           Func<List<double>, int> selection, Func<bool[,], bool[,], (bool[,], bool[,])> crossover,
+           Func<bool[,], bool[,]> mutation, Func<List<bool[,]>, bool> termCondition, double crossoverPropability,
+           double mutationPropability)
+        {
+            var population = initialPopulation;
+
+            while (termCondition(population))
+            {
+                var fit = new List<double>();
+                var parents = new List<bool[,]>();
+                var children = new List<bool[,]>();
+
+                foreach (var specimen in population)
+                    fit.Add(fitness(specimen));
+
+                for (var i = 0; i < initialPopulation.Count; i++)
+                    parents.Add(population[selection(fit)]);
+
+                for (var i = 0; i < initialPopulation.Count - 1; i += 2)
+                {
+                    var u = new Random().NextDouble();
+
+                    if (crossoverPropability < u)
+                    {
+                        (var a, var b) = crossover(parents[i], parents[i + 1]);
+                        children.Add(a);
+                        children.Add(b);
+                    }
+                    else
+                    {
+                        children.Add(parents[i]);
+                        children.Add(parents[i + 1]);
+                    }
+                }
+
+                for (var i = 0; i < initialPopulation.Count - 1; i += 2)
+                {
+                    var u = new Random().NextDouble();
+
+                    if (mutationPropability < u)
+                        children[i] = mutation(children[i]);
+                }
+
+                population = children;
+            }
+
+            return population.Find(x => fitness(x) == population.Max(y => fitness(y)));
         }
     }
 }

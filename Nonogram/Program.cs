@@ -15,7 +15,14 @@ namespace Nonogram
                 var program = Menu();
 
                 if (program == 6)
-                    Stats.GenerateStats(inputsFilename: "inputs_list.json", outputFilename: "stats.csv");
+                {
+                    Console.WriteLine("Ilosc zadan z inputs.json (max 17) [int]: ");
+                    var range = int.Parse(Console.ReadLine());
+                    Console.WriteLine("Czy wywolac bez metody brutforce? [true/false]: ");
+                    var withoutBruteForce = bool.Parse(Console.ReadLine());
+
+                    Stats.GenerateStats(inputsFilename: "inputs_list.json", outputFilename: "stats.csv", range: range, withoutBruteForce: withoutBruteForce);
+                }
                 else
                 {
                     var boardValues = JsonHelper.ReadInputFile("input.json");
@@ -47,23 +54,17 @@ namespace Nonogram
 
                                 parameters.Add(iteration);
                                 parameters.Add(parameter);
-                            }else
+                            }
+                            else
                                 parameters.AddRange(ChoseParameters("Ilosc itearcji [int]", "Parametr temperatury [double]", "Wypisywac iteracje? [bool]"));
 
                             result = Invoke(nameof(Method.SimulatedAnnealing), parameters);
                             break;
                         case 5:
-                            parameters.AddRange(ChoseParameters("Rozmiar populacji [int]", "Ilosc iteracji [int]", "Prawdopodobienstwo krzyzowania [double]", 
+                            parameters.AddRange(ChoseParameters("Rozmiar populacji [int]", "Ilosc iteracji [int]", "Prawdopodobienstwo krzyzowania [double]",
                                 "Prawdopodobienstwo mutacji [double]", "Metoda krzyzowania [OnePoint/TwoPoints]",
                                 "Metoda selekcji [Rulet/Rank/Tournament]", "Warunek zakonczenia [Iteration/Mean/Deviation]"));
-                            var geneticAlgorithm = new GeneticAlgorithm();
-
-                            geneticAlgorithm.GetType()
-                             .GetMember("SetParameters")
-                             .OfType<MethodInfo>()
-                             .FirstOrDefault(i => i.GetParameters().Count() == parameters.Count)
-                             .Invoke(geneticAlgorithm, parameters.ToArray());
-                            result = geneticAlgorithm.Run();
+                            result = Invoke(nameof(Method.Genetic), parameters);
                             break;
                     }
                     watch.Stop();

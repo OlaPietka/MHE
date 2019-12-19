@@ -15,11 +15,11 @@ namespace Nonogram
     {
         private static readonly int _repeatNumber = 25;
 
-        public static void GenerateStats(string inputsFilename, string outputFilename, bool withoutBruteForce = true)
+        public static void GenerateStats(string inputsFilename, string outputFilename, int range = 17, bool withoutBruteForce = true)
         {
             var methods = Type.GetType("Nonogram.Method").GetMethods(BindingFlags.Public | BindingFlags.Static).ToList();
             var selectedMethods = methods.GetRange(Convert.ToInt32(withoutBruteForce), methods.Count - 1);
-            var examples = JsonHelper.ReadInputListFile(inputsFilename);
+            var examples = JsonHelper.ReadInputListFile(inputsFilename).GetRange(0, range);
 
             var csv = new StringBuilder();
             csv.AppendLine("METODA,ROZMIAR,CZAS,ERROR");
@@ -38,15 +38,9 @@ namespace Nonogram
                         obj[0] = example;
                         for (var j = 1; j < parametersLength; j++)
                             obj[j] = parameters[j].DefaultValue;
-                        Result result;
 
                         var watch = Stopwatch.StartNew();
-                        if (method.Name == "Genetic")
-                        {
-                            var gen = new GeneticAlgorithm();
-                            result = gen.Run();
-                        }else
-                            result = (Result)method.Invoke(Type.GetType("Nonogram.Method"), obj);
+                        var result = (Result)method.Invoke(Type.GetType("Nonogram.Method"), obj);
                         watch.Stop();
 
                         result.Time = watch.ElapsedMilliseconds / 1000f;
