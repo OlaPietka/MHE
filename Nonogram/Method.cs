@@ -115,6 +115,8 @@ namespace Nonogram
 
         public static Result SimulatedAnnealing(BoardValues boardValues, int iteration = 10000, double parameter = 40000.0, bool write = true, Func<int, double> T = null)
         {
+            Console.WriteLine("---SIMULATEDANNEALING---\n");
+
             if (T == null)
                 T = x => { return parameter / x; };
 
@@ -151,6 +153,8 @@ namespace Nonogram
             double mutationPropability = 0.1, string crossoverMethod = "OnePoint", string selectionMethod = "Tournament",
             string termConditionMethod = "Iteration")
         {
+            Console.WriteLine("---GENETIC---\n");
+
             var genetic = new GeneticAlgorithm(boardValues, populationSize, iterationCount, crossoverPropability, mutationPropability, crossoverMethod, selectionMethod, termConditionMethod);
             return genetic.Run();
         }

@@ -28,6 +28,11 @@ namespace Nonogram
         private double _crossoverPropability;
         private double _mutationPropability;
 
+        private int _meanTermConditionCount = 100;
+        private double _meanTermConditionPrevious = 0;
+        private int _deviationTermConditionCount = 100;
+        private double _deviationTermConditionPrevious = 0;
+
 
         public GeneticAlgorithm(BoardValues boardValues, int populationSize = 10, int iterationCount = 10, double crossoverPropability = 0.9,
             double mutationPropability = 0.1, string crossoverMethod = "OnePoint", string selectionMethod = "Tournament",
@@ -102,17 +107,11 @@ namespace Nonogram
 
                 newA[pointX, pointY] = !newA[pointX, pointY];
 
-                Console.WriteLine($"Before: {BoardHelper.CheckForErrors(_boardValues, a)} After: {BoardHelper.CheckForErrors(_boardValues, newA)}");
-
                 return newA;
             };
 
             _iterationTermCondition = pop =>
             {
-                foreach (var s in pop)
-                    Console.Write(BoardHelper.CheckForErrors(_boardValues, s) + " ");
-                Console.WriteLine();
-
                 _iterationCount--;
 
                 return (_iterationCount > 0);
@@ -122,16 +121,26 @@ namespace Nonogram
             {
                 var mean = pop.Sum(x => _fitness(x)) / pop.Count;
 
-                return mean < 999 ? true : false;
+                if (mean == _meanTermConditionPrevious)
+                    _meanTermConditionCount--;
+                else
+                    _meanTermConditionPrevious = mean;
+
+                return (mean < (1000 / pop.Count) - 10) && (_meanTermConditionCount > 0) ? true : false;
             };
 
             _deviationTermCondition = pop =>
             {
                 var mean = pop.Sum(x => _fitness(x)) / pop.Count;
 
-                var w = pop.Sum(x => Math.Pow(_fitness(x) - mean, 2)) / pop.Count;
+                var w = Math.Sqrt(pop.Sum(x => Math.Pow(_fitness(x) - mean, 2)) / (pop.Count - 1));
 
-                return Math.Sqrt(w) > 0 ? true : false;
+                if (w == _deviationTermConditionPrevious)
+                    _deviationTermConditionCount--;
+                else
+                    _deviationTermConditionPrevious = w;
+
+                return w > pop.Count && _deviationTermConditionCount > 0 ? true : false;
             };
 
             _tournamentSelection = fitnesses => {

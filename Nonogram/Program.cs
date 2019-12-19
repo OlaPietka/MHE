@@ -16,7 +16,7 @@ namespace Nonogram
 
                 if (program == 6)
                 {
-                    Console.WriteLine("Ilosc zadan z inputs.json (max 17) [int]: ");
+                    Console.WriteLine("\n\nIlosc zadan z inputs.json (max 17) [int]: ");
                     var range = int.Parse(Console.ReadLine());
                     Console.WriteLine("Czy wywolac bez metody brutforce? [true/false]: ");
                     var withoutBruteForce = bool.Parse(Console.ReadLine());
@@ -48,12 +48,11 @@ namespace Nonogram
                             break;
                         case 4:
                             Console.WriteLine("\n\nPuscic eksperyment? [t/n] :");
-                            if (Console.ReadKey().KeyChar == 'T')
+                            if (Console.ReadKey().KeyChar == 't')
                             {
-                                (var iteration, var parameter) = Other.RunExperiment(boardValues);
+                                (var iteration, var parameter) = Other.RunExperimentSimulatedAnnealing(boardValues);
 
-                                parameters.Add(iteration);
-                                parameters.Add(parameter);
+                                parameters.AddRange(new List<object>() { iteration, parameter });
                             }
                             else
                                 parameters.AddRange(ChoseParameters("Ilosc itearcji [int]", "Parametr temperatury [double]", "Wypisywac iteracje? [bool]"));
@@ -61,9 +60,20 @@ namespace Nonogram
                             result = Invoke(nameof(Method.SimulatedAnnealing), parameters);
                             break;
                         case 5:
-                            parameters.AddRange(ChoseParameters("Rozmiar populacji [int]", "Ilosc iteracji [int]", "Prawdopodobienstwo krzyzowania [double]",
+                            Console.WriteLine("\n\nPuscic eksperyment? [t/n] :");
+                            if (Console.ReadKey().KeyChar == 't')
+                            {
+                                (int populationSize, int iterationCount, double crossoverPropability, double mutationPropability, string crossoverMethod,
+                                    string selectionMethod, string termConditionMethod) = Other.RunExperimentGenetic(boardValues);
+
+                                parameters.AddRange(new List<object>() { populationSize, iterationCount, crossoverPropability, mutationPropability,
+                                    crossoverMethod, selectionMethod, termConditionMethod});
+                            }
+                            else
+                                parameters.AddRange(ChoseParameters("Rozmiar populacji [int]", "Ilosc iteracji [int]", "Prawdopodobienstwo krzyzowania [double]",
                                 "Prawdopodobienstwo mutacji [double]", "Metoda krzyzowania [OnePoint/TwoPoints]",
                                 "Metoda selekcji [Rulet/Rank/Tournament]", "Warunek zakonczenia [Iteration/Mean/Deviation]"));
+
                             result = Invoke(nameof(Method.Genetic), parameters);
                             break;
                     }
