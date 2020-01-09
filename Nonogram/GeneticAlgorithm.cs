@@ -9,6 +9,7 @@ namespace Nonogram
     public class GeneticAlgorithm
     {
         private BoardValues _boardValues;
+        private bool _parallel;
         private int _populationSize;
         private int _iterationCount;
         private List<bool[,]> _initialPopulation;
@@ -36,11 +37,12 @@ namespace Nonogram
 
         public GeneticAlgorithm(BoardValues boardValues, int populationSize = 10, int iterationCount = 10, double crossoverPropability = 0.9,
             double mutationPropability = 0.1, string crossoverMethod = "OnePoint", string selectionMethod = "Tournament",
-            string termConditionMethod = "Iteration")
+            string termConditionMethod = "Iteration", bool parallel = true)
         {
             var rnd = new Random();
 
             _boardValues = boardValues;
+            _parallel = parallel;
             _populationSize = populationSize;
             _crossoverPropability = crossoverPropability;
             _mutationPropability = mutationPropability;
@@ -215,7 +217,7 @@ namespace Nonogram
         public Result Run()
         {
             var result = Algorithm(_initialPopulation, _fitness, _selection, _crossover,
-                _mutation, _termCondition, _crossoverPropability, _mutationPropability);
+                _mutation, _termCondition, _crossoverPropability, _mutationPropability, _parallel);
 
             return new Result(result, _boardValues);
         }
@@ -223,22 +225,42 @@ namespace Nonogram
         private bool[,] Algorithm(List<bool[,]> initialPopulation, Func<bool[,], double> fitness,
            Func<List<double>, int> selection, Func<bool[,], bool[,], (bool[,], bool[,])> crossover,
            Func<bool[,], bool[,]> mutation, Func<List<bool[,]>, bool> termCondition, double crossoverPropability,
-           double mutationPropability)
+           double mutationPropability, bool parallel)
         {
             var population = initialPopulation;
+            var fit = new List<double>();
 
-            while (termCondition(population))
-            {
-                var fit = new List<double>();
-                var parents = new List<bool[,]>();
-                var children = new List<bool[,]>();
-
+            if (parallel)
+                Parallel.ForEach(population, specimen =>
+                {
+                    var tmp = fitness(specimen);
+                    lock (fit)
+                    {
+                        fit.Add(tmp);
+                    }
+                });
+            else
                 foreach (var specimen in population)
                     fit.Add(fitness(specimen));
 
-                for (var i = 0; i < initialPopulation.Count; i++)
-                    parents.Add(population[selection(fit)]);
+            while (termCondition(population))
+            {
+                var parents = new List<bool[,]>();
+                var children = new List<bool[,]>();
 
+                if (parallel)
+                    Parallel.For(0, initialPopulation.Count, _ =>
+                    {
+                        var tmp = population[selection(fit)];
+                        lock (parents)
+                        {
+                            parents.Add(tmp);
+                        }
+                    });
+                else
+                    for (var i = 0; i < initialPopulation.Count; i++)
+                        parents.Add(population[selection(fit)]);
+                
                 for (var i = 0; i < initialPopulation.Count - 1; i += 2)
                 {
                     var u = new Random().NextDouble();
@@ -265,6 +287,15 @@ namespace Nonogram
                 }
 
                 population = children;
+
+                if(parallel)
+                    Parallel.For(0, population.Count, i =>
+                    {
+                        fit[i] = fitness(population[i]);
+                    });
+                else
+                    for(var i = 0; i < population.Count; i++)
+                        fit[i] = fitness(population[i]);
             }
 
             return population.Find(x => fitness(x) == population.Max(y => fitness(y)));

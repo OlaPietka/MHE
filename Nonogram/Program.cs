@@ -14,7 +14,7 @@ namespace Nonogram
                 Console.Clear();
                 var program = Menu();
 
-                if (program == 6)
+                if (program == 7)
                 {
                     Console.WriteLine("\n\nIlosc zadan z inputs.json (max 17) [int]: ");
                     var range = int.Parse(Console.ReadLine());
@@ -30,20 +30,23 @@ namespace Nonogram
                     var parameters = new List<object>();
                     parameters.Add(boardValues);
 
-                    var watch = Stopwatch.StartNew();
+                    var watch = new Stopwatch();
                     switch (program)
                     {
                         case 1:
+                            watch = Stopwatch.StartNew();
                             result = Method.BruteForce(boardValues);
                             break;
 
                         case 2:
                             parameters.AddRange(ChoseParameters("Ilosc itearcji [int]"));
+                            watch = Stopwatch.StartNew();
                             result = Invoke(nameof(Method.HillClimb), parameters);
                             break;
 
                         case 3:
                             parameters.AddRange(ChoseParameters("Ilosc itearcji [int]", "Rozmiar tabu [int]"));
+                            watch = Stopwatch.StartNew();
                             result = Invoke(nameof(Method.Tabu), parameters);
                             break;
                         case 4:
@@ -57,6 +60,7 @@ namespace Nonogram
                             else
                                 parameters.AddRange(ChoseParameters("Ilosc itearcji [int]", "Parametr temperatury [double]", "Wypisywac iteracje? [bool]"));
 
+                            watch = Stopwatch.StartNew();
                             result = Invoke(nameof(Method.SimulatedAnnealing), parameters);
                             break;
                         case 5:
@@ -72,10 +76,14 @@ namespace Nonogram
                             else
                                 parameters.AddRange(ChoseParameters("Rozmiar populacji [int]", "Ilosc iteracji [int]", "Prawdopodobienstwo krzyzowania [double]",
                                 "Prawdopodobienstwo mutacji [double]", "Metoda krzyzowania [OnePoint/TwoPoints]",
-                                "Metoda selekcji [Rulet/Rank/Tournament]", "Warunek zakonczenia [Iteration/Mean/Deviation]"));
+                                "Metoda selekcji [Rulet/Rank/Tournament]", "Warunek zakonczenia [Iteration/Mean/Deviation]", "Czy rownolegle [bool]"));
 
+                            watch = Stopwatch.StartNew();
                             result = Invoke(nameof(Method.Genetic), parameters);
                             break;
+                        case 6:
+                            Stats.ParallelVsNotParallel(boardValues);
+                            goto END;
                     }
                     watch.Stop();
 
@@ -86,6 +94,7 @@ namespace Nonogram
                     JsonHelper.WriteOutputFile(result, "output.json");
                 }
 
+            END:
                 Console.WriteLine("0. POWROT DO MENU");
                 Console.WriteLine("1. POWTÓRZ");
             } while (Console.ReadKey().KeyChar == '0');
@@ -101,7 +110,8 @@ namespace Nonogram
             Console.WriteLine("     3. Tabu");
             Console.WriteLine("     4. Simulated Annealing");
             Console.WriteLine("     5. Genetic");
-            Console.WriteLine("6. Statystka dla wszystkich metod i przykladow z inputs.json");
+            Console.WriteLine("       6. Genetic parallel vs not parallel stats");
+            Console.WriteLine("7. Statystka dla wszystkich metod i przykladow z inputs.json");
             return int.Parse(Console.ReadKey().KeyChar.ToString());
         }
 

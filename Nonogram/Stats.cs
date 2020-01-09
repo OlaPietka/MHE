@@ -162,5 +162,29 @@ namespace Nonogram
                     var pdfExporter = new PdfExporter { Width = 600, Height = 400 };
                     pdfExporter.Export(model, stream);
                 }            }        }
+
+        public static void ParallelVsNotParallel(BoardValues boardValues)
+        {
+            var parallel = new List<Result>();
+            var notParallel = new List<Result>();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var watch = Stopwatch.StartNew();
+                var result = Method.Genetic(boardValues, 1000, 500, 0.4, 0.5, "OnePoint", "Tournament", "Iteration", i % 2 == 0);
+                watch.Stop();
+
+                result.Time = watch.ElapsedMilliseconds / 1000f;
+
+                if (i % 2 == 0)
+                    parallel.Add(result);
+                else
+                    notParallel.Add(result);
+            }
+
+            Console.WriteLine("----- PARALLEL -----|----- NOT PARALLEL -----");
+            for(var i = 0; i < parallel.Count; i++)
+                Console.WriteLine($"Time:{parallel[i].Time} Error:{parallel[i].Error} | Time:{notParallel[i].Time} Error:{notParallel[i].Error}");
+        }
     }
 }

@@ -151,11 +151,11 @@ namespace Nonogram
 
         public static Result Genetic(BoardValues boardValues, int populationSize = 10, int iterationCount = 10, double crossoverPropability = 0.9,
             double mutationPropability = 0.1, string crossoverMethod = "OnePoint", string selectionMethod = "Tournament",
-            string termConditionMethod = "Iteration")
+            string termConditionMethod = "Iteration", bool parallel = true)
         {
             Console.WriteLine("---GENETIC---\n");
 
-            var genetic = new GeneticAlgorithm(boardValues, populationSize, iterationCount, crossoverPropability, mutationPropability, crossoverMethod, selectionMethod, termConditionMethod);
+            var genetic = new GeneticAlgorithm(boardValues, populationSize, iterationCount, crossoverPropability, mutationPropability, crossoverMethod, selectionMethod, termConditionMethod, parallel);
             return genetic.Run();
         }
     }
