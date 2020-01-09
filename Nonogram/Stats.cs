@@ -133,7 +133,7 @@ namespace Nonogram
                 var title = i == 0 ? "Time" : "Error";
                 var data = i == 0 ? timeData : errorData;
 
-                var model = new PlotModel { Title = $"{inputFilename.Replace('_', ' ').Replace(".csv", "")} {title.ToLower()} plot"};
+                var model = new PlotModel { Title = $"{inputFilename.Replace('_', ' ').Replace(".csv", "")} {title.ToLower()} plot" };
                 model.Axes.Add(new LinearAxis
                 {
                     Title = "Size",
@@ -168,7 +168,7 @@ namespace Nonogram
             var parallel = new List<Result>();
             var notParallel = new List<Result>();
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 40; i++)
             {
                 var watch = Stopwatch.StartNew();
                 var result = Method.Genetic(boardValues, 1000, 500, 0.4, 0.5, "OnePoint", "Tournament", "Iteration", i % 2 == 0);
@@ -183,8 +183,25 @@ namespace Nonogram
             }
 
             Console.WriteLine("----- PARALLEL -----|----- NOT PARALLEL -----");
-            for(var i = 0; i < parallel.Count; i++)
-                Console.WriteLine($"Time:{parallel[i].Time} Error:{parallel[i].Error} | Time:{notParallel[i].Time} Error:{notParallel[i].Error}");
+            for (var i = 0; i < parallel.Count; i++)
+                Console.WriteLine($"Time:{parallel[i].Time} Error:{parallel[i].Error} | " +
+                    $"Time:{notParallel[i].Time} Error:{notParallel[i].Error}");
+            Console.WriteLine("--------------------|------------------------");
+
+            var pTimeSum = 0f;
+            var pErrorSum = 0;
+            var nTimeSum = 0f;
+            var nErrorSum = 0;
+            for (var i = 0; i < parallel.Count; i++)
+            {
+                pTimeSum += parallel[i].Time;
+                pErrorSum += parallel[i].Error;
+                nTimeSum += notParallel[i].Time;
+                nErrorSum += notParallel[i].Error;
+            }
+
+            Console.WriteLine($"Time:{pTimeSum / parallel.Count} Error:{pErrorSum / parallel.Count} | " +
+                $"Time:{nTimeSum / parallel.Count} Error:{nErrorSum / parallel.Count}");
         }
     }
 }

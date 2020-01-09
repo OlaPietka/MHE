@@ -247,19 +247,9 @@ namespace Nonogram
             {
                 var parents = new List<bool[,]>();
                 var children = new List<bool[,]>();
-
-                if (parallel)
-                    Parallel.For(0, initialPopulation.Count, _ =>
-                    {
-                        var tmp = population[selection(fit)];
-                        lock (parents)
-                        {
-                            parents.Add(tmp);
-                        }
-                    });
-                else
-                    for (var i = 0; i < initialPopulation.Count; i++)
-                        parents.Add(population[selection(fit)]);
+               
+                for (var i = 0; i < initialPopulation.Count; i++)
+                    parents.Add(population[selection(fit)]);
                 
                 for (var i = 0; i < initialPopulation.Count - 1; i += 2)
                 {
