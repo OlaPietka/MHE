@@ -14,7 +14,7 @@ namespace Nonogram
                 Console.Clear();
                 var program = Menu();
 
-                if (program == 7)
+                if (program == 8)
                 {
                     Console.WriteLine("\n\nIlosc zadan z inputs.json (max 17) [int]: ");
                     var range = int.Parse(Console.ReadLine());
@@ -84,6 +84,14 @@ namespace Nonogram
                         case 6:
                             Stats.ParallelVsNotParallel(boardValues);
                             goto END;
+                        case 7:
+                            parameters.AddRange(ChoseParameters("Rozmiar populacji [int]", "Ilosc iteracji [int]", "Ilosc wysp [int]", 
+                            "Prawdopodobienstwo krzyzowania [double]", "Prawdopodobienstwo mutacji [double]", "Metoda krzyzowania [OnePoint/TwoPoints]",
+                            "Metoda selekcji [Rulet/Rank/Tournament]", "Czy rownolegle [bool]"));
+
+                            watch = Stopwatch.StartNew();
+                            result = Invoke(nameof(Method.IslandGenetic), parameters);
+                            break;
                     }
                     watch.Stop();
 
@@ -100,7 +108,6 @@ namespace Nonogram
             } while (Console.ReadKey().KeyChar == '0');
         }
 
-
         private static int Menu()
         {
             Console.WriteLine("WYBIERZ PROGRAM:");
@@ -111,8 +118,26 @@ namespace Nonogram
             Console.WriteLine("     4. Simulated Annealing");
             Console.WriteLine("     5. Genetic");
             Console.WriteLine("       6. Genetic parallel vs not parallel stats");
-            Console.WriteLine("7. Statystka dla wszystkich metod i przykladow z inputs.json");
+            Console.WriteLine("     7. Island Genetic");
+            Console.WriteLine("8. Statystka dla wszystkich metod i przykladow z inputs.json");
             return int.Parse(Console.ReadKey().KeyChar.ToString());
+        }
+
+        private static void read()
+        {
+            var line = Console.ReadLine();
+            var prms = line.Split(' ');
+            var parametersName = new List<string>();
+            var parametersValue = new List<string>();
+
+            foreach (var prm in prms)
+            {
+                if (prm.ToString().StartsWith("-"))
+                    parametersName.Add(prm);
+                else
+                    parametersValue.Add(prm);
+            }
+
         }
 
         private static List<object> ChoseParameters(params string[] parameters)

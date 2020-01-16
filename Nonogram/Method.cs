@@ -158,5 +158,15 @@ namespace Nonogram
             var genetic = new GeneticAlgorithm(boardValues, populationSize, iterationCount, crossoverPropability, mutationPropability, crossoverMethod, selectionMethod, termConditionMethod, parallel);
             return genetic.Run();
         }
+
+        public static Result IslandGenetic(BoardValues boardValues, int populationSize = 10, int iterationCount = 10, int islandCount = 5, 
+            double crossoverPropability = 0.9, double mutationPropability = 0.1, string crossoverMethod = "OnePoint", 
+            string selectionMethod = "Tournament", bool parallel = true)
+        {
+            Console.WriteLine("---ISLAND GENETIC---\n");
+
+            var genetic = new GeneticAlgorithm(boardValues, populationSize, iterationCount, islandCount, crossoverPropability, mutationPropability, crossoverMethod, selectionMethod, parallel);
+            return genetic.Run(isIsland: true);
+        }
     }
 }
