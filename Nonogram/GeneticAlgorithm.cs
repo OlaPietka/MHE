@@ -38,7 +38,7 @@ namespace Nonogram
 
         public GeneticAlgorithm(BoardValues boardValues, int populationSize = 10, int iterationCount = 10, double crossoverPropability = 0.9,
             double mutationPropability = 0.1, string crossoverMethod = "OnePoint", string selectionMethod = "Tournament",
-            string termConditionMethod = "Iteration", bool parallel = true)
+            string termConditionMethod = "Iteration", bool parallel = false)
         {
             var rnd = new Random();
 
@@ -208,7 +208,7 @@ namespace Nonogram
 
         public GeneticAlgorithm(BoardValues boardValues, int populationSize = 10, int iterationCount = 10, int islandCount = 5,
             double crossoverPropability = 0.9, double mutationPropability = 0.1, string crossoverMethod = "OnePoint", 
-            string selectionMethod = "Tournament", bool parallel = true)
+            string selectionMethod = "Tournament", bool parallel = false)
         {
             var rnd = new Random();
 
