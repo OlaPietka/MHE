@@ -13,6 +13,9 @@ namespace Nonogram
 
         static void Main(string[] args)
         {
+            var e = new EvolutionStrategy();
+            Console.WriteLine(e.Run());
+
         menu:
             Menu();
 
